@@ -9,7 +9,8 @@ VALUES
     ('Quality Assurance'),
     ('Client Success');
 
-INSERT INTO role (title, salary, department_id)
+INSERT INTO 
+    job(title, salary, department_id)
 VALUES
 ('Product Team Lead', 75000, 1)
 ('Product Web Developer', 50000, 1)
