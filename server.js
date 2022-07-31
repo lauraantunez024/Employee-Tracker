@@ -25,7 +25,7 @@ function base() {
                     "Add Department",
                     "Add Role",
                     "Add Employee",
-                    "Update Employee Role",
+                    // "Update Employee Role",
                     "Done",
                 ]
             }
@@ -49,9 +49,9 @@ function base() {
                 case "Add Employee":
                     addEmployee();
                     break;
-                case "Update Employee Role":
-                    updateEmployee();
-                    break;
+                // case "Update Employee Role":
+                //     updateEmployee();
+                //     break;
                 default:
                     base();
 
@@ -94,12 +94,14 @@ function viewRoles() {
 };
 
 function addEmployee() {
+    let roleChoices;
+    let managerChoices;
     connection
         .promise()
         .query("SELECT id, title FROM role")
         .then(([results]) => {
             console.log(results);
-            const roleChoices = results.map((a) => {
+            roleChoices = results.map((a) => {
                 return {
                     name: a.title,
                     value: a.id,
@@ -110,56 +112,57 @@ function addEmployee() {
                 .promise()
                 .query("SELECT id, first_name, last_name FROM employee")
                 .then(([results]) => {
-                    const managerChoices = results.map((a) => {
+                    managerChoices = results.map((a) => {
                         return {
-                            name: `${a.first_name} ${a.last_name}`,
+                            name: a.lastName,
                             value: a.id
                         }
                     })
 
-                })
+               
         }).then(() => {
             inquirer
         .prompt([
             {
                 type: "input",
-                name: "first_name",
+                name: "firstName",
                 message: "Enter employee's first name?",
             },
             {
                 type: "input",
-                name: "last_name",
+                name: "lastName",
                 message: "Enter employee's last name",
 
             },
             {
                 type: "list",
-                name: "role_id",
+                name: "roleId",
                 message: "Enter employee's role id",
                 choices: roleChoices
             },
             {
                 type: "list",
-                name: "manager_id",
+                name: "managerId",
                 message: "Enter employee's manager id",
                 choices: managerChoices
-
             
             }
         ]).then((a) => {
             connection.query(
-                "INSERT INTO employee (first_name, role_id, manager_id VALUES (?, ?, ?, ?,)",
+                "INSERT INTO employee (first_name, last_name, role_id, manager_id VALUES (?, ?, ?, ?)",
                 [
-                    a.first_name,
-                    a.last_name,
-                    a.role_id,
-                    parseInt(a.manager_id)
+                    a.firstName,
+                    a.lastName,
+                    a.roleId,
+                    a.managerId
                 ]
             );
             base();
         })
      })
+    })
 };
+
 
 function addRole() {
     connection
@@ -192,23 +195,38 @@ function addRole() {
                         message: "Choose the department for the new role?",
                         choices: deptChoice
                     }
-                ])
-            }).then((a) => {
+                    ])
+                    .then((a) => {
                 connection.query(
                     "INSERT INTO role (title, salary, department_id) VALUES (?,?,?);",
                     [a.new_role, a.new_salary, a.new_dept]
                 )
                 base();
             })
-        }
+        })
+};
 
 function addDept() {
+    inquirer
+        .prompt({
+            type: "input",
+            name: "new_dept",
+            message: "What is the new department?"
+        }).then((a) => {
+            connection
+                .query(
+                    "INSERT INTO department (name) VALUES (?);",
+                    a.new_dept
+                )
+            viewDept();
+        })
 
-}
+};
 
-function updateEmployee() {
+// function updateEmployee() {
 
-}
+
+// };
     
 
 
